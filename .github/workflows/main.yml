@@ -14,10 +14,11 @@ jobs:
           node-version: 16
       - name: Install packages
         run: npm ci
-      - name: Lint and test
+      - name: Lint
+        run: npm run lint
+      - name: Test
         run: npm run test
-        
-        
+
   report:
     runs-on: ubuntu-latest
     steps:
@@ -32,8 +33,4 @@ jobs:
             
             Repository: ${{ github.repository }}
             
-<<<<<<< HEAD
             See changes: https://github.com/${{ github.repository }}/commit/${{github.sha}}
-=======
-            See changes: https://github.com/${{ github.repository }}/commit/${{github.sha}}
->>>>>>> 5f6ce00e1b4b153739a391571b3f3de2d98fe7da
