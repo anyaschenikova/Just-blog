@@ -1,8 +1,8 @@
-import BlogList from "./BlogList";
-import useFetch from "./useFetch";
+import BlogList from './BlogList';
+import useFetch from './useFetch';
 
-const Home = () => {
-  const { error, isPending, data: blogs } = useFetch('http://localhost:8000/blogs')
+function Home() {
+  const { error, isPending, data: blogs } = useFetch('http://localhost:8000/blogs');
 
   return (
     <div className="home">
@@ -12,5 +12,5 @@ const Home = () => {
     </div>
   );
 }
- 
+
 export default Home;

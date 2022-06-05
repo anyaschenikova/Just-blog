@@ -1,0 +1,19 @@
+version: "3"
+services:
+  react-app:
+    image: react-app
+    ports:
+      - "3000:3000"
+    networks:
+      - blog-app
+
+  json-server:
+    image: json-server
+    ports:
+      - "8000:8000"
+    networks:
+      - blog-app
+
+networks:
+  blog-app:
+    driver: bridge
