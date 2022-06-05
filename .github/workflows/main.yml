@@ -32,4 +32,8 @@ jobs:
             
             Repository: ${{ github.repository }}
             
+<<<<<<< HEAD
             See changes: https://github.com/${{ github.repository }}/commit/${{github.sha}}
+=======
+            See changes: https://github.com/${{ github.repository }}/commit/${{github.sha}}
+>>>>>>> 5f6ce00e1b4b153739a391571b3f3de2d98fe7da
