@@ -15,10 +15,10 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "test:lint:js": "eslint --fix .",
-    "test:lint:css": "stylelint \"**/*.css\"",
-    "test:unit": "react-scripts test --env=jsdom --watchAll=false",
-    "test": "run-s test:**",
+    "lint:js": "eslint --fix .",
+    "lint:css": "stylelint \"**/*.css\"",
+    "lint": "run-s lint:**",
+    "test": "react-scripts test --env=jsdom --watchAll=false",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
