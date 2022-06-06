@@ -126,7 +126,7 @@ jobs:
         uses: actions/upload-artifact@v3.1.0
         with:
           name: $ {{ env.artifact_name }}
-          path: my_app/
+          path: app_**
           retention_days: 1
           
   report_build:
