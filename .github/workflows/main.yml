@@ -157,7 +157,7 @@ jobs:
           name: ${{ env.artifact_name }}
           
       - name: try to archive folder
-        run: tar czf artifact.tar.gz ./build
+        run: tar czf artifact.tar.gz /home/runner/work/Just-blog/Just-blog
           
       - name: send telegram message on push
         uses: appleboy/telegram-action@master
