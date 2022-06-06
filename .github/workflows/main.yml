@@ -42,10 +42,42 @@ jobs:
             FIX IT!! CI FAILED!!
             ${{ github.actor }} created commit:
             See changes: https://github.com/${{ github.repository }}/commit/${{github.sha}}
+            
+  test:
+    runs-on: ubuntu-20.04
+    needs: [install]
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Use cached node modules
+        uses: actions/cache@v3
+        env:
+          cache-name: cache-node-modules
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('package.json') }}
+
+      - name: Test
+        run: npm run test
+
+  report_test:
+    if: failure()
+    runs-on: ubuntu-20.04
+    needs: [test]
+    steps:
+      - name: send message if TEST fail
+        uses: appleboy/telegram-action@master
+        with:
+          to: ${{ secrets.TELEGRAM_TO }}
+          token: ${{ secrets.TELEGRAM_TOKEN }}
+          message: |
+            FIX IT!! TEST FAILED!!
+            ${{ github.actor }} created commit:
+            See changes: https://github.com/${{ github.repository }}/commit/${{github.sha}}
       
   lint:
     runs-on: ubuntu-20.04
-    needs: [install]
+    needs: [test]
     steps:
       - uses: actions/checkout@v3
 
@@ -75,41 +107,11 @@ jobs:
             ${{ github.actor }} created commit:
             See changes: https://github.com/${{ github.repository }}/commit/${{github.sha}}
   
-  test:
-    runs-on: ubuntu-20.04
-    needs: [lint]
-    steps:
-      - uses: actions/checkout@v3
-
-      - name: Use cached node modules
-        uses: actions/cache@v3
-        env:
-          cache-name: cache-node-modules
-        with:
-          path: node_modules
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('package.json') }}
-
-      - name: Test
-        run: npm run test
-
-  report_test:
-    if: failure()
-    runs-on: ubuntu-20.04
-    needs: [test]
-    steps:
-      - name: send message if TEST fail
-        uses: appleboy/telegram-action@master
-        with:
-          to: ${{ secrets.TELEGRAM_TO }}
-          token: ${{ secrets.TELEGRAM_TOKEN }}
-          message: |
-            FIX IT!! TEST FAILED!!
-            ${{ github.actor }} created commit:
-            See changes: https://github.com/${{ github.repository }}/commit/${{github.sha}}
+ 
 
   build:
     runs-on: ubuntu-20.04
-    needs: [test]
+    needs: [lint]
     steps:
       - uses: actions/checkout@v3
       
@@ -154,14 +156,14 @@ jobs:
       - name: Download a Build Artifact
         uses: actions/download-artifact@v3.0.0
         with:
-          name: $ {{ env.artifact_name }}
+          name: ${{ env.artifact_name }}
           
       - name: send telegram message on push
         uses: appleboy/telegram-action@master
         with:
           to: ${{ secrets.TELEGRAM_TO }}
           token: ${{ secrets.TELEGRAM_TOKEN }}
-          document: $ {{ env.artifact_name }}
+          document: ${{ env.artifact_name }}
           message: |
             GOT IT!
             See changes: https://github.com/${{ github.repository }}/commit/${{github.sha}}
