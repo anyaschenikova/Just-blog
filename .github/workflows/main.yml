@@ -5,7 +5,7 @@ on:
     branches: [master]
     
 env:
-  artifact_name: app_ver_${{ github.sha }}
+  artifact_name: app_dev
 
 jobs:
   install:
@@ -106,9 +106,7 @@ jobs:
             FIX IT!! LINT FAILED!!
             ${{ github.actor }} created commit:
             See changes: https://github.com/${{ github.repository }}/commit/${{github.sha}}
-  
- 
-
+            
   build:
     runs-on: ubuntu-20.04
     needs: [lint]
