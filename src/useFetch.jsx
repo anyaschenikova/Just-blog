@@ -24,7 +24,7 @@ const useFetch = (url) => {
         })
         .catch((err) => {
           if (err.name === 'AbortError') {
-            console.log('fetch aborted');
+            console.log("fetch aborted"); // eslint-disable-line no-console
           } else {
             // auto catches network / connection error
             setIsPending(false);
