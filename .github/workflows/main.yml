@@ -5,7 +5,7 @@ on:
     branches: [master]
     
 env:
-  artifact_name: app_dev
+  artifact_name: app_ver_${{ github.sha }}
 
 jobs:
   install:
@@ -127,9 +127,9 @@ jobs:
       - name: Upload a Build Artifact
         uses: actions/upload-artifact@v3.1.0
         with:
-          name: $ {{ env.artifact_name }}
+          name: ${{ env.artifact_name }}
           path: build
-          retention_days: 1
+          retention-days: 1
           
   report_build:
     if: failure()
