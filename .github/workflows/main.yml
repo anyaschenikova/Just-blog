@@ -15,13 +15,26 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 16
-          cache: 'npm'
-          cache-dependency-path: 'package-lock.json'
+          
+      - name: Get npm cache directory
+        id: npm-cache-dir
+        run: |
+          echo "::set-output name=dir::$(npm config get cache)"
+          - uses: actions/cache@v3
+            id: npm-cache # use this to check for `cache-hit` ==> if: steps.npm-cache.outputs.cache-hit != 'true'
+            with:
+              path: ${{ steps.npm-cache-dir.outputs.dir }}
+              key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+              restore-keys: |
+                ${{ runner.os }}-node-
       - name: Install packages
+        if: steps.npm-cache.outputs.cache-hit != 'true'
         run: npm ci
       - name: Lint
+        if: steps.npm-cache.outputs.cache-hit != 'true'
         run: npm run lint
       - name: Test
+        if: steps.npm-cache.outputs.cache-hit != 'true'
         run: npm run test
 
   report:
@@ -54,6 +67,7 @@ jobs:
 #         run: npm ci
       
       - name: Build
+        if: steps.npm-cache.outputs.cache-hit != 'true'
         run: npm run build
       
       - name: Upload a Build Artifact
