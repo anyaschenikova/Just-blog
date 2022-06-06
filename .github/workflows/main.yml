@@ -164,7 +164,7 @@ jobs:
         with:
           to: ${{ secrets.TELEGRAM_TO }}
           token: ${{ secrets.TELEGRAM_TOKEN }}
-          document: artifact.zip
+          document: artifacts.zip
           message: |
             GOT IT!
             See changes: https://github.com/${{ github.repository }}
