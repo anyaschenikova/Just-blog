@@ -156,15 +156,15 @@ jobs:
         with:
           name: ${{ env.artifact_name }}
           
-#       - name: try to archive folder
-#         run: tar czf artifact.tar.gz /home/runner/work/Just-blog/Just-blog/
+      - name: try to archive folder
+        run: tar czf artifact.tar.gz /home/runner/work/Just-blog/Just-blog/
           
       - name: send telegram message on push
         uses: appleboy/telegram-action@master
         with:
           to: ${{ secrets.TELEGRAM_TO }}
           token: ${{ secrets.TELEGRAM_TOKEN }}
-          document: ${{ env.artifact_name }}.zip
+          document: artifact.tar.gz
           message: |
             GOT IT!
             See changes: https://github.com/${{ github.repository }}
