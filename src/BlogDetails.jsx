@@ -22,7 +22,7 @@ function BlogDetails() {
         <article>
           <h2>{blog.title}</h2>
           <p>
-            Written by
+            Written by&nbsp;
             {blog.author}
           </p>
           <div>{blog.body}</div>

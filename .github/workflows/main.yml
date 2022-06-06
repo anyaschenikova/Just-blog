@@ -3,33 +3,98 @@ on:
   push:
   pull_request:
     branches: [master]
-    
-env:
-  artifact_name: app_ver_${{ github.sha }}
 
 jobs:
-  install_and_test:
-    runs-on: ubuntu-latest
+  install:
+    runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
           node-version: 16
-          cache: 'npm'
-          cache-dependency-path: '**/package-lock.json'
+      - name: Cache node modules
+        id: cache-npm
+        uses: actions/cache@v3
+        env:
+          cache-name: cache-node-modules
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('package.json') }}
       - name: Install packages
+        if: steps.cache-npm.outputs.cache-hit != 'true'
+        id: install
         run: npm ci
+
+  report_install:
+    if: failure()
+    runs-on: ubuntu-20.04
+    needs: [install]
+    steps:
+      - name: send message if INSTALL fail
+        uses: appleboy/telegram-action@master
+        with:
+          to: ${{ secrets.TELEGRAM_TO }}
+          token: ${{ secrets.TELEGRAM_TOKEN }}
+          message: |
+            FIX IT!! CI FAILED!!
+            ${{ github.actor }} created commit:
+            See changes: https://github.com/${{ github.repository }}/commit/${{github.sha}}
+      
+  lint:
+    runs-on: ubuntu-20.04
+    needs: [install]
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Use cached node modules
+        uses: actions/cache@v3
+        env:
+          cache-name: cache-node-modules
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('package.json') }}
+
       - name: Lint
         run: npm run lint
+
+  report_lint:
+    if: failure()
+    runs-on: ubuntu-20.04
+    needs: [lint]
+    steps:
+      - name: send message if LINT fail
+        uses: appleboy/telegram-action@master
+        with:
+          to: ${{ secrets.TELEGRAM_TO }}
+          token: ${{ secrets.TELEGRAM_TOKEN }}
+          message: |
+            FIX IT!! LINT FAILED!!
+            ${{ github.actor }} created commit:
+            See changes: https://github.com/${{ github.repository }}/commit/${{github.sha}}
+  
+  test:
+    runs-on: ubuntu-20.04
+    needs: [lint]
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Use cached node modules
+        uses: actions/cache@v3
+        env:
+          cache-name: cache-node-modules
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('package.json') }}
+
       - name: Test
         run: npm run test
 
   report_test:
     if: failure()
-    runs-on: ubuntu-latest
-    needs: [install_and_test]
+    runs-on: ubuntu-20.04
+    needs: [test]
     steps:
-      - name: send telegram message on push
+      - name: send message if TEST fail
         uses: appleboy/telegram-action@master
         with:
           to: ${{ secrets.TELEGRAM_TO }}
@@ -37,35 +102,39 @@ jobs:
           message: |
             FIX IT!! TEST FAILED!!
             ${{ github.actor }} created commit:
-            Commit message: ${{ github.event.commits[0].message }}
-            
-            Repository: ${{ github.repository }}
-            
             See changes: https://github.com/${{ github.repository }}/commit/${{github.sha}}
+
+
   build:
-    runs-on: ubuntu-latest
-    needs: [install_and_test]
+    runs-on: ubuntu-20.04
+    needs: [test]
     steps:
       - uses: actions/checkout@v3
-      - name: Install packages
-        run: npm ci
+      
+      - name: Use cached node modules
+        uses: actions/cache@v3
+        env:
+          cache-name: cache-node-modules
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('package.json') }}
       
       - name: Build
-        if: steps.npm-cache.outputs.cache-hit != 'true'
         run: npm run build
       
       - name: Upload a Build Artifact
         uses: actions/upload-artifact@v3.1.0
         with:
           name: $ {{ env.artifact_name }}
+          path: my_app/
           retention_days: 1
           
   report_build:
     if: failure()
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     needs: [build]
     steps:
-      - name: send telegram message on push
+      - name: send message if BUILD fail
         uses: appleboy/telegram-action@master
         with:
           to: ${{ secrets.TELEGRAM_TO }}
@@ -73,14 +142,10 @@ jobs:
           message: |
             FIX IT!! BUILD FAILED!!
             ${{ github.actor }} created commit:
-            Commit message: ${{ github.event.commits[0].message }}
-            
-            Repository: ${{ github.repository }}
-            
             See changes: https://github.com/${{ github.repository }}/commit/${{github.sha}}
             
   export_build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     needs: [build]
     steps:
     

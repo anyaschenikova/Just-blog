@@ -9,7 +9,7 @@ function BlogList({ blogs }) {
           <Link to={`/blogs/${blog.id}`}>
             <h2>{blog.title}</h2>
             <p>
-              Written by
+              Written by&nbsp;
               {blog.author}
             </p>
           </Link>

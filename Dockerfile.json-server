@@ -1,8 +1,9 @@
 FROM node:16
-WORKDIR /usr/src/server
 
-COPY . .
+WORKDIR /usr/app
+
+COPY data/db.json data/db.json
 
 EXPOSE 8000
-
+RUN ["npm", "install", "json-server"]
 CMD ["npx", "json-server", "--watch", "data/db.json",  "--host", "0.0.0.0", "--port", "8000" ]
