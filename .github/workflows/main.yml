@@ -3,6 +3,9 @@ on:
   push:
   pull_request:
     branches: [master]
+    
+env:
+  artifact_name: app_ver_${{ github.sha }}
 
 jobs:
   install:
@@ -104,7 +107,6 @@ jobs:
             ${{ github.actor }} created commit:
             See changes: https://github.com/${{ github.repository }}/commit/${{github.sha}}
 
-
   build:
     runs-on: ubuntu-20.04
     needs: [test]
@@ -126,7 +128,7 @@ jobs:
         uses: actions/upload-artifact@v3.1.0
         with:
           name: $ {{ env.artifact_name }}
-          path: app_**
+          path: build
           retention_days: 1
           
   report_build:
