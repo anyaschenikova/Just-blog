@@ -19,6 +19,7 @@
       "required": {
         "some": ["nesting", "id"]
       }
-    }]
+    }],
+    "no-console": "off",
   }
 }
