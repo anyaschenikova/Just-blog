@@ -5,7 +5,7 @@ on:
     branches: [master]
     
 env:
-  global_env: global
+  artifact_name: app_ver_${{ github.sha }}
 
 jobs:
   install_and_test:
@@ -57,7 +57,7 @@ jobs:
       - name: Upload a Build Artifact
         uses: actions/upload-artifact@v3.1.0
         with:
-          name: my_app
+          name: $ {{ env.artifact_name }}
           retention_days: 1
           
   report_build:
@@ -77,6 +77,26 @@ jobs:
             
             Repository: ${{ github.repository }}
             
+            See changes: https://github.com/${{ github.repository }}/commit/${{github.sha}}
+            
+  export_build:
+    runs-on: ubuntu-latest
+    needs: [build]
+    steps:
+    
+      - name: Download a Build Artifact
+        uses: actions/download-artifact@v3.0.0
+        with:
+          name: $ {{ env.artifact_name }}
+          
+      - name: send telegram message on push
+        uses: appleboy/telegram-action@master
+        with:
+          to: ${{ secrets.TELEGRAM_TO }}
+          token: ${{ secrets.TELEGRAM_TOKEN }}
+          document: $ {{ env.artifact_name }}
+          message: |
+            GOT IT!
             See changes: https://github.com/${{ github.repository }}/commit/${{github.sha}}
         
 
